@@ -8,65 +8,86 @@ use Illuminate\Http\Request;
 
 class CursoController extends Controller
 {
-    // Listagem
     public function index()
     {
         $rows = Curso::all();
         return view('admin.cursos.index', compact('rows'));
     }
 
-    // Formulário de adição
     public function adicionar()
     {
         return view('admin.cursos.adicionar');
     }
 
-    // Salva novo curso
-    public function salvar(Request $request)
+    public function salvar(Request $req)
     {
-        $request->validate([
-            'titulo'    => 'required|max:255',
-            'descricao' => 'required',
-            'imagem'    => 'required',
-            'valor'     => 'required|numeric',
-            'publicado' => 'required|in:sim,não',
-        ]);
+        $dados = $req->all();
 
-        Curso::create($request->only(['titulo', 'descricao', 'imagem', 'valor', 'publicado']));
+        if(isset($dados['publicado'])){
+            $dados['publicado'] = 'sim';
+        } else {
+            $dados['publicado'] = 'nao';
+        }
 
-        return redirect()->route('admin.cursos')->with('sucesso', 'Curso cadastrado com sucesso!');
+        if($req->hasFile('arquivo')){
+            $imagem = $req->file('arquivo');
+
+            $num = rand(1111,9999);
+            $dir = "img/cursos/";
+            $ex = $imagem->guessClientExtension();
+
+            $nomeImagem = "imagem_".$num.".".$ex;
+
+            $imagem->move($dir,$nomeImagem);
+
+            $dados['imagem'] = $dir."/".$nomeImagem;
+        }
+
+        Curso::create($dados);
+
+        return redirect()->route('admin.cursos');
     }
 
-    // Formulário de edição
     public function editar($id)
     {
-        $curso = Curso::findOrFail($id);
-        return view('admin.cursos.editar', compact('curso'));
+        $linha = Curso::find($id);
+
+        return view('admin.cursos.editar', compact('linha'));
     }
 
-    // Atualiza curso existente
-    public function atualizar(Request $request, $id)
+    public function atualizar(Request $req, $id)
     {
-        $request->validate([
-            'titulo'    => 'required|max:255',
-            'descricao' => 'required',
-            'imagem'    => 'required',
-            'valor'     => 'required|numeric',
-            'publicado' => 'required|in:sim,não',
-        ]);
+        $dados = $req->all();
 
-        $curso = Curso::findOrFail($id);
-        $curso->update($request->only(['titulo', 'descricao', 'imagem', 'valor', 'publicado']));
+        if(isset($dados['publicado'])){
+            $dados['publicado'] = 'sim';
+        } else {
+            $dados['publicado'] = 'nao';
+        }
 
-        return redirect()->route('admin.cursos')->with('sucesso', 'Curso atualizado com sucesso!');
+        if($req->hasFile('arquivo')){
+            $imagem = $req->file('arquivo');
+
+            $num = rand(1111,9999);
+            $dir = "img/cursos/";
+            $ex = $imagem->guessClientExtension();
+
+            $nomeImagem = "imagem_".$num.".".$ex;
+
+            $imagem->move($dir,$nomeImagem);
+
+            $dados['imagem'] = $dir."/".$nomeImagem;
+        }
+
+        Curso::find($id)->update($dados);
+
+        return redirect()->route('admin.cursos');
     }
 
-    // Exclui curso
     public function excluir($id)
     {
-        $curso = Curso::findOrFail($id);
-        $curso->delete();
+        Curso::find($id)->delete();
 
-        return redirect()->route('admin.cursos')->with('sucesso', 'Curso excluído com sucesso!');
+        return redirect()->route('admin.cursos');
     }
 }
