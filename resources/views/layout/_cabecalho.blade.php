@@ -18,6 +18,7 @@
             <ul id="nav-mobile" class="right hide-on-med-and-down">
                 <li><a href="/">Home</a></li>
                 <li><a href="{{ route('admin.cursos') }}">Cursos</a></li>
+                <li><a href="{{ route('admin.alunos') }}">Alunos</a></li>
             </ul>
         </div>
     </div>
