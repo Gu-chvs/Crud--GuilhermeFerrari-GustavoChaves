@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Auth\GoogleController;
 
 // Redireciona a raiz para a listagem de cursos
 Route::get('/', function () {
@@ -36,6 +37,13 @@ Route::get('/admin/cursos/excluir/{id}', [
     'as' => 'admin.cursos.excluir',
     'uses' => 'App\Http\Controllers\Admin\CursoController@excluir'
 ]);
+
+// Redireciona o usuário para o Google
+Route::get('/auth/google',
+    [GoogleController::class, 'redirectToGoogle'])->name('auth.google');
+// Callback onde o Google retorna os dados do usuário
+Route::get('/auth/google/callback',
+    [GoogleController::class, 'handleGoogleCallback']);
 
 // Rotas para o CRUD de Alunos (Aula 3)
 Route::get('/admin/alunos', ['as' => 'admin.alunos', 'uses'=>'App\Http\Controllers\Admin\alunoController@index']);
